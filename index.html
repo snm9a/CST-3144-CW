@@ -16,6 +16,9 @@
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
     <style>
+        
+
+        
         body {
             font-family: Arial, sans-serif;
             margin: 20px;
@@ -59,6 +62,18 @@
                 width: 100%;
             }
         }
+        .sort-panel {
+    margin-bottom: 20px;
+}
+
+.sort-panel select {
+    padding: 8px;
+    margin: 5px;
+}
+         
+    
+
+        
     </style>
 </head>
 
@@ -70,12 +85,30 @@
 
         <p>Choose an after-school lesson.</p>
 
+        <div class="sort-panel">
+    <label for="sortBy">Sort by:</label>
+
+    <select id="sortBy" v-model="sortBy">
+        <option value="subject">Subject</option>
+        <option value="location">Location</option>
+        <option value="price">Price</option>
+        <option value="spaces">Spaces</option>
+    </select>
+
+    <label for="sortOrder">Order:</label>
+
+    <select id="sortOrder" v-model="sortOrder">
+        <option value="asc">Ascending</option>
+        <option value="desc">Descending</option>
+    </select>
+</div>
+
         <div class="activity-board">
 
             <!-- Display one card for each lesson. -->
             <div
                 class="course-tile"
-                v-for="lesson in lessons"
+                v-for="lesson in sortedLessons"
                 :key="lesson.id">
 
                 <i :class="lesson.icon" aria-hidden="true"></i>
@@ -99,9 +132,11 @@
             el: "#app",
 
             data: {
-                sitename: "After-School Lessons",
+    sitename: "After-School Lessons",
+    sortBy: "subject",
+    sortOrder: "asc",
 
-                lessons: [
+    lessons: [
     {
         id: 1,
         subject: "Mathematics",
@@ -208,7 +243,35 @@
         spaces: 5,
         icon: "fas fa-camera"
     },
-                ]
+                    ]
+            },
+
+            computed: {
+                sortedLessons: function () {
+                    const field = this.sortBy;
+                    const order = this.sortOrder;
+
+                    // Copy the array before sorting it.
+                    const result = this.lessons.slice();
+
+                    result.sort(function (a, b) {
+                        let comparison;
+
+                        if (field === "price" || field === "spaces") {
+                            comparison = a[field] - b[field];
+                        } else {
+                            comparison = a[field].localeCompare(b[field]);
+                        }
+
+                        if (order === "desc") {
+                            comparison = -comparison;
+                        }
+
+                        return comparison;
+                    });
+
+                    return result;
+                }
             }
         });
     </script>
