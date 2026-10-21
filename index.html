@@ -27,6 +27,39 @@
             text-align: center;
         }
 
+        button,
+        input,
+        select,
+        textarea {
+            font: inherit;
+            padding: 8px;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        button:disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        .page-controls {
+            margin-bottom: 20px;
+        }
+
+        .sort-panel {
+            margin-bottom: 20px;
+        }
+
+        .sort-panel select {
+            margin: 5px;
+        }
+
+        .search-panel {
+            margin-bottom: 15px;
+        }
+
         .activity-board {
             display: flex;
             flex-wrap: wrap;
@@ -50,13 +83,49 @@
             font-size: 20px;
         }
 
-        .sort-panel {
+        .checkout-box {
+            background: white;
+            border: 1px solid #ccc;
+            max-width: 450px;
+            padding: 20px;
+            margin-top: 25px;
+        }
+
+        .checkout-box label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .checkout-box input,
+        .checkout-box select,
+        .checkout-box textarea {
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .checkout-box textarea {
+            resize: vertical;
+        }
+
+        .form-field {
+            margin-bottom: 15px;
+        }
+
+        .error-text {
+            color: #b00020;
+            font-size: 13px;
+        }
+
+        .notice-box {
+            padding: 15px;
+            border: 1px solid #285a8e;
+            background: #eaf2fa;
             margin-bottom: 20px;
         }
 
-        .sort-panel select {
-            padding: 8px;
-            margin: 5px;
+        .small-note {
+            font-size: 13px;
+            color: #555;
         }
 
         [v-cloak] {
@@ -66,6 +135,16 @@
         @media (max-width: 550px) {
             .course-tile {
                 width: 100%;
+            }
+
+            .sort-panel label {
+                display: block;
+                margin-top: 10px;
+            }
+
+            .search-panel input {
+                width: 100%;
+                box-sizing: border-box;
             }
         }
     </style>
@@ -77,53 +156,355 @@
 
         <h1>{{ sitename }}</h1>
 
-        <p>Choose an after-school lesson.</p>
+        <!-- Switch between lessons and cart. -->
+        <div class="page-controls">
+            <button
+                type="button"
+                v-on:click="showLessons = !showLessons"
+                :disabled="cart.length === 0">
 
-        <p>Spaces in cart: {{ cart.length }}</p>
-
-        <div class="sort-panel">
-            <label for="sortBy">Sort by:</label>
-
-            <select id="sortBy" v-model="sortBy">
-                <option value="subject">Subject</option>
-                <option value="location">Location</option>
-                <option value="price">Price</option>
-                <option value="spaces">Spaces</option>
-            </select>
-
-            <label for="sortOrder">Order:</label>
-
-            <select id="sortOrder" v-model="sortOrder">
-                <option value="asc">Ascending</option>
-                <option value="desc">Descending</option>
-            </select>
+                {{ showLessons ? 'View Cart' : 'Back to Lessons' }}
+                ({{ cart.length }})
+            </button>
         </div>
 
-        <div class="activity-board">
+        <!-- Temporary checkout message. -->
+        <div
+            class="notice-box"
+            v-if="checkoutMessage"
+            role="status">
 
-            <!-- Display one card for each lesson. -->
-            <div
-                class="course-tile"
-                v-for="lesson in sortedLessons"
-                :key="lesson.id">
+            <p>{{ checkoutMessage }}</p>
 
-                <i :class="lesson.icon" aria-hidden="true"></i>
+            <button
+                type="button"
+                v-on:click="checkoutMessage = ''">
 
-                <h2>{{ lesson.subject }}</h2>
+                Close message
+            </button>
+        </div>
 
-                <p>Location: {{ lesson.location }}</p>
+        <!-- LESSON PAGE -->
+        <div v-if="showLessons">
 
-                <p>Price: {{ lesson.price }} AED</p>
+            <p>Choose an after-school lesson.</p>
 
-                <p>Spaces: {{ lesson.spaces }}</p>
+            <div class="search-panel">
+                <label for="searchText">Search lessons:</label>
 
-                <button
-                    type="button"
-                    v-on:click="addToCart(lesson)"
-                    :disabled="lesson.spaces === 0">
+                <input
+                    id="searchText"
+                    type="search"
+                    v-model="searchText"
+                    placeholder="Search subject, location, price or spaces">
+            </div>
 
-                    Add to Cart
-                </button>
+            <div class="sort-panel">
+                <label for="sortBy">Sort by:</label>
+
+                <select id="sortBy" v-model="sortBy">
+                    <option value="subject">Subject</option>
+                    <option value="location">Location</option>
+                    <option value="price">Price</option>
+                    <option value="spaces">Spaces</option>
+                </select>
+
+                <label for="sortOrder">Order:</label>
+
+                <select id="sortOrder" v-model="sortOrder">
+                    <option value="asc">Ascending</option>
+                    <option value="desc">Descending</option>
+                </select>
+            </div>
+
+            <p>Showing {{ sortedLessons.length }} lessons.</p>
+
+            <p v-if="sortedLessons.length === 0">
+                No lessons match your search.
+            </p>
+
+            <div class="activity-board">
+
+                <!-- Display each lesson using v-for. -->
+                <div
+                    class="course-tile"
+                    v-for="lesson in sortedLessons"
+                    :key="lesson.id">
+
+                    <i
+                        :class="lesson.icon"
+                        aria-hidden="true">
+                    </i>
+
+                    <h2>{{ lesson.subject }}</h2>
+
+                    <p>Location: {{ lesson.location }}</p>
+
+                    <p>Price: {{ lesson.price }} AED</p>
+
+                    <p>Spaces: {{ lesson.spaces }}</p>
+
+                    <button
+                        type="button"
+                        v-on:click="addToCart(lesson)"
+                        :disabled="lesson.spaces === 0">
+
+                        Add to Cart
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- CART PAGE -->
+        <div v-else>
+
+            <h2>Your Cart</h2>
+
+            <p>Selected spaces: {{ cart.length }}</p>
+
+            <p v-if="cart.length === 0">
+                Your cart is empty.
+            </p>
+
+            <div class="activity-board">
+
+                <!-- One entry represents one selected space. -->
+                <div
+                    class="course-tile"
+                    v-for="(lessonId, index) in cart"
+                    :key="index">
+
+                    <i
+                        :class="findLesson(lessonId).icon"
+                        aria-hidden="true">
+                    </i>
+
+                    <h2>{{ findLesson(lessonId).subject }}</h2>
+
+                    <p>
+                        Location:
+                        {{ findLesson(lessonId).location }}
+                    </p>
+
+                    <p>
+                        Price:
+                        {{ findLesson(lessonId).price }} AED
+                    </p>
+
+                    <p>Quantity: 1 space</p>
+
+                    <button
+                        type="button"
+                        v-on:click="removeFromCart(index)">
+
+                        Remove
+                    </button>
+
+                </div>
+
+            </div>
+
+            <h3>Total: {{ cartTotal }} AED</h3>
+
+            <!-- Allows returning even after removing all items. -->
+            <button
+                type="button"
+                v-on:click="showLessons = true">
+
+                Continue browsing
+            </button>
+
+            <!-- CHECKOUT -->
+            <div class="checkout-box">
+
+                <h2>Checkout</h2>
+
+                <p class="small-note">
+                    Frontend demo only. Orders are not yet saved.
+                </p>
+
+                <p class="small-note">
+                    Fields marked * are required.
+                </p>
+
+                <form
+                    v-on:submit.prevent="checkout"
+                    novalidate>
+
+                    <h3>Customer details</h3>
+
+                    <div class="form-field">
+                        <label for="customerName">
+                            Name *
+                        </label>
+
+                        <input
+                            id="customerName"
+                            type="text"
+                            v-model="customerName"
+                            autocomplete="given-name"
+                            aria-describedby="nameHelp"
+                            required>
+
+                        <p id="nameHelp" class="small-note">
+                            Letters A–Z only, without spaces,
+                            numbers or punctuation.
+                        </p>
+
+                        <p
+                            class="error-text"
+                            v-if="customerName !== '' && !validName">
+
+                            Please enter letters only.
+                        </p>
+                    </div>
+
+                    <div class="form-field">
+                        <label for="customerPhone">
+                            Phone number *
+                        </label>
+
+                        <input
+                            id="customerPhone"
+                            type="tel"
+                            inputmode="numeric"
+                            v-model="customerPhone"
+                            autocomplete="tel"
+                            aria-describedby="phoneHelp"
+                            required>
+
+                        <p id="phoneHelp" class="small-note">
+                            Digits 0–9 only, without spaces or +.
+                        </p>
+
+                        <p
+                            class="error-text"
+                            v-if="customerPhone !== '' && !validPhone">
+
+                            Please enter digits only.
+                        </p>
+                    </div>
+
+                    <h3>Address details</h3>
+
+                    <div class="form-field">
+                        <label for="city">
+                            City / Emirate *
+                        </label>
+
+                        <select
+                            id="city"
+                            v-model="city"
+                            autocomplete="address-level1"
+                            required>
+
+                            <option disabled value="">
+                                Choose your emirate
+                            </option>
+
+                            <option>Abu Dhabi</option>
+                            <option>Dubai</option>
+                            <option>Sharjah</option>
+                            <option>Ajman</option>
+                            <option>Umm Al Quwain</option>
+                            <option>Ras Al Khaimah</option>
+                            <option>Fujairah</option>
+                        </select>
+                    </div>
+
+                    <div class="form-field">
+                        <label for="area">
+                            Area / Neighbourhood *
+                        </label>
+
+                        <input
+                            id="area"
+                            type="text"
+                            v-model="area"
+                            placeholder="For example: Al Barsha"
+                            required>
+                    </div>
+
+                    <div class="form-field">
+                        <label for="street">
+                            Street *
+                        </label>
+
+                        <input
+                            id="street"
+                            type="text"
+                            v-model="street"
+                            placeholder="Street name or number"
+                            required>
+                    </div>
+
+                    <div class="form-field">
+                        <label for="building">
+                            Building / Villa number *
+                        </label>
+
+                        <input
+                            id="building"
+                            type="text"
+                            v-model="building"
+                            placeholder="Building name or villa number"
+                            required>
+                    </div>
+
+                    <div class="form-field">
+                        <label for="apartment">
+                            Apartment / Unit — optional
+                        </label>
+
+                        <input
+                            id="apartment"
+                            type="text"
+                            v-model="apartment"
+                            placeholder="For example: Apartment 204">
+                    </div>
+
+                    <div class="form-field">
+                        <label for="orderNotes">
+                            Additional notes — optional
+                        </label>
+
+                        <textarea
+                            id="orderNotes"
+                            v-model="orderNotes"
+                            rows="3"
+                            maxlength="500"
+                            placeholder="Anything you would like us to know">
+                        </textarea>
+                    </div>
+
+                    <p
+                        class="small-note"
+                        v-if="cart.length === 0">
+
+                        Add a lesson before checking out.
+                    </p>
+
+                    <p
+                        class="small-note"
+                        v-if="!validAddress">
+
+                        Complete the required address fields.
+                    </p>
+
+                    <h3>Order total: {{ cartTotal }} AED</h3>
+
+                    <!-- Always visible on the cart page. -->
+                    <button
+                        type="submit"
+                        :disabled="!canCheckout">
+
+                        Checkout
+                    </button>
+
+                </form>
 
             </div>
 
@@ -137,9 +518,25 @@
 
             data: {
                 sitename: "After-School Lessons",
+
+                showLessons: true,
+                searchText: "",
                 sortBy: "subject",
                 sortOrder: "asc",
+
                 cart: [],
+
+                customerName: "",
+                customerPhone: "",
+
+                city: "",
+                area: "",
+                street: "",
+                building: "",
+                apartment: "",
+                orderNotes: "",
+
+                checkoutMessage: "",
 
                 lessons: [
                     {
@@ -251,12 +648,23 @@
 
             computed: {
                 sortedLessons: function () {
+                    const query = this.searchText.trim().toLowerCase();
                     const field = this.sortBy;
                     const order = this.sortOrder;
 
-                    // Sort a copy so the original array stays in order.
-                    const result = this.lessons.slice();
+                    // Temporary frontend search.
+                    const result = this.lessons.filter(function (lesson) {
+                        const searchableText = [
+                            lesson.subject,
+                            lesson.location,
+                            lesson.price,
+                            lesson.spaces
+                        ].join(" ").toLowerCase();
 
+                        return searchableText.includes(query);
+                    });
+
+                    // Sort the matching lessons.
                     result.sort(function (a, b) {
                         let comparison;
 
@@ -274,16 +682,91 @@
                     });
 
                     return result;
+                },
+
+                cartTotal: function () {
+                    let total = 0;
+
+                    for (let i = 0; i < this.cart.length; i++) {
+                        const lesson = this.findLesson(this.cart[i]);
+                        total += lesson.price;
+                    }
+
+                    return total;
+                },
+
+                validName: function () {
+                    return /^[A-Za-z]+$/.test(this.customerName);
+                },
+
+                validPhone: function () {
+                    return /^[0-9]+$/.test(this.customerPhone);
+                },
+
+                validAddress: function () {
+                    return this.city !== "" &&
+                        this.area.trim() !== "" &&
+                        this.street.trim() !== "" &&
+                        this.building.trim() !== "";
+                },
+
+                canCheckout: function () {
+                    return this.cart.length > 0 &&
+                        this.validName &&
+                        this.validPhone &&
+                        this.validAddress;
                 }
             },
 
             methods: {
+                findLesson: function (lessonId) {
+                    return this.lessons.find(function (lesson) {
+                        return lesson.id === lessonId;
+                    });
+                },
+
                 addToCart: function (lesson) {
-                    // Only add a lesson when a space is available.
                     if (lesson.spaces > 0) {
                         this.cart.push(lesson.id);
                         lesson.spaces--;
+                        this.checkoutMessage = "";
                     }
+                },
+
+                removeFromCart: function (index) {
+                    const lessonId = this.cart[index];
+                    const lesson = this.findLesson(lessonId);
+
+                    // Restore one available space.
+                    lesson.spaces++;
+
+                    // Remove one selected space.
+                    this.cart.splice(index, 1);
+
+                    this.checkoutMessage = "";
+                },
+
+                checkout: function () {
+                    if (!this.canCheckout) {
+                        return;
+                    }
+
+                    // Demonstrate validation.
+                    // The backend will save the order later.
+                    this.checkoutMessage =
+                        "Checkout details are valid for " +
+                        this.customerName +
+                        ". Address: " +
+                        this.building.trim() +
+                        ", " +
+                        this.street.trim() +
+                        ", " +
+                        this.area.trim() +
+                        ", " +
+                        this.city +
+                        ". Total: " +
+                        this.cartTotal +
+                        " AED. Demo only: no order has been saved.";
                 }
             }
         });
