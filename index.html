@@ -7,13 +7,7 @@
 
     <title>After-School Lessons</title>
 
-    <!-- Vue.js -->
     <script src="https://unpkg.com/vue@2.7.16/dist/vue.js"></script>
-
-    <!-- Font Awesome -->
-    <link
-        rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
     <style>
         :root {
@@ -195,7 +189,7 @@
             flex-direction: column;
             align-items: flex-start;
             min-width: 0;
-            padding: 25px;
+            padding: 22px;
             border: 2px solid var(--ink);
             border-radius: 24px;
             background: var(--card-colour);
@@ -205,7 +199,6 @@
                 box-shadow 0.2s ease;
         }
 
-        /* Colours stay attached to each lesson when sorting. */
         .tone-0 {
             --card-colour: var(--peach);
         }
@@ -231,16 +224,16 @@
             box-shadow: 5px 10px 0 var(--ink);
         }
 
-        .course-tile > i {
-            display: grid;
-            place-items: center;
-            width: 65px;
-            height: 65px;
+        .lesson-picture {
+            display: block;
+            width: 100%;
+            height: auto;
+            aspect-ratio: 5 / 4;
+            object-fit: contain;
             margin-bottom: 20px;
             border: 2px solid var(--ink);
-            border-radius: 18px;
-            background: var(--white);
-            font-size: 27px;
+            border-radius: 16px;
+            background: #fffaf0;
         }
 
         .course-tile h2 {
@@ -612,7 +605,7 @@
             Make your afternoon count.
         </p>
 
-        <!-- Cart navigation -->
+        <!-- Switch between the lesson list and cart. -->
         <div class="page-controls">
             <button
                 type="button"
@@ -624,7 +617,6 @@
             </button>
         </div>
 
-        <!-- Demo checkout confirmation -->
         <div
             class="notice-box"
             v-if="checkoutMessage"
@@ -685,7 +677,14 @@
                     :key="lesson.id"
                     :class="'tone-' + ((lesson.id - 1) % 5)">
 
-                    <i :class="lesson.icon" aria-hidden="true"></i>
+                    <!-- Individual clay illustration -->
+                    <img
+                        class="lesson-picture"
+                        :src="lesson.image"
+                        :alt="lesson.subject + ' illustration'"
+                        width="500"
+                        height="400"
+                        loading="lazy">
 
                     <h2>{{ lesson.subject }}</h2>
 
@@ -734,7 +733,6 @@
                             </span>
                         </div>
 
-                        <!-- Five markers represent the initial capacity. -->
                         <div class="space-markers" aria-hidden="true">
                             <span
                                 v-for="marker in 5"
@@ -746,7 +744,6 @@
                             </span>
                         </div>
 
-                        <!-- Explain the most recent change. -->
                         <div aria-live="polite" aria-atomic="true">
                             <transition name="space-event">
                                 <div
@@ -819,10 +816,13 @@
                     :key="index"
                     :class="'tone-' + ((lessonId - 1) % 5)">
 
-                    <i
-                        :class="findLesson(lessonId).icon"
-                        aria-hidden="true">
-                    </i>
+                    <img
+                        class="lesson-picture"
+                        :src="findLesson(lessonId).image"
+                        :alt="findLesson(lessonId).subject + ' illustration'"
+                        width="500"
+                        height="400"
+                        loading="lazy">
 
                     <h2>{{ findLesson(lessonId).subject }}</h2>
 
@@ -860,7 +860,7 @@
                 Continue browsing
             </button>
 
-            <!-- CHECKOUT FORM -->
+            <!-- CHECKOUT -->
             <div class="checkout-box">
 
                 <h2>Checkout</h2>
@@ -1003,7 +1003,6 @@
 
                     <h3>Order total: {{ cartTotal }} AED</h3>
 
-                    <!-- Errors update as the customer types. -->
                     <div
                         v-if="checkoutErrors.length > 0"
                         class="error-text"
@@ -1074,7 +1073,7 @@
                         location: "Al Barsha",
                         price: 80,
                         spaces: 5,
-                        icon: "fas fa-calculator"
+                        image: "images/maths.png"
                     },
                     {
                         id: 2,
@@ -1082,7 +1081,7 @@
                         location: "Jumeirah",
                         price: 75,
                         spaces: 5,
-                        icon: "fas fa-book"
+                        image: "images/english.png"
                     },
                     {
                         id: 3,
@@ -1090,7 +1089,7 @@
                         location: "Mirdif",
                         price: 90,
                         spaces: 5,
-                        icon: "fas fa-flask"
+                        image: "images/science.png"
                     },
                     {
                         id: 4,
@@ -1098,7 +1097,7 @@
                         location: "Al Quoz",
                         price: 65,
                         spaces: 5,
-                        icon: "fas fa-palette"
+                        image: "images/art.png"
                     },
                     {
                         id: 5,
@@ -1106,7 +1105,7 @@
                         location: "Dubai Marina",
                         price: 100,
                         spaces: 5,
-                        icon: "fas fa-music"
+                        image: "images/music.png"
                     },
                     {
                         id: 6,
@@ -1114,7 +1113,7 @@
                         location: "Mirdif",
                         price: 70,
                         spaces: 5,
-                        icon: "fas fa-futbol"
+                        image: "images/football.png"
                     },
                     {
                         id: 7,
@@ -1122,7 +1121,7 @@
                         location: "Jumeirah",
                         price: 85,
                         spaces: 5,
-                        icon: "fas fa-basketball-ball"
+                        image: "images/basketball.png"
                     },
                     {
                         id: 8,
@@ -1130,7 +1129,7 @@
                         location: "Al Nahda",
                         price: 95,
                         spaces: 5,
-                        icon: "fas fa-swimmer"
+                        image: "images/swimming.png"
                     },
                     {
                         id: 9,
@@ -1138,7 +1137,7 @@
                         location: "Silicon Oasis",
                         price: 110,
                         spaces: 5,
-                        icon: "fas fa-laptop-code"
+                        image: "images/coding.png"
                     },
                     {
                         id: 10,
@@ -1146,7 +1145,7 @@
                         location: "Academic City",
                         price: 120,
                         spaces: 5,
-                        icon: "fas fa-robot"
+                        image: "images/robotics.png"
                     },
                     {
                         id: 11,
@@ -1154,7 +1153,7 @@
                         location: "Jumeirah Beach",
                         price: 450,
                         spaces: 5,
-                        icon: "fas fa-swimmer"
+                        image: "images/diving.png"
                     },
                     {
                         id: 12,
@@ -1162,7 +1161,7 @@
                         location: "Academic City",
                         price: 195,
                         spaces: 5,
-                        icon: "fas fa-football-ball"
+                        image: "images/rugby.png"
                     },
                     {
                         id: 13,
@@ -1170,7 +1169,7 @@
                         location: "Dubai Marina",
                         price: 620,
                         spaces: 5,
-                        icon: "fas fa-camera"
+                        image: "images/photography.png"
                     }
                 ]
             },
@@ -1300,7 +1299,6 @@
                     this.cart.push(lesson.id);
                     lesson.spaces--;
 
-                    // Track the change so Vue can display and animate it.
                     this.$set(this.spaceChanges, lesson.id, {
                         before: previousSpaces,
                         delta: -1,
@@ -1346,7 +1344,6 @@
                         this.cartTotal +
                         " AED. Frontend demo only — no order has been saved.";
 
-                    // Keep the cart until backend submission is implemented.
                     window.scrollTo({
                         top: 0,
                         behavior: window.matchMedia(
