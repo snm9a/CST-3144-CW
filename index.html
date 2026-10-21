@@ -16,135 +16,586 @@
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            background: #f5f5f5;
-            color: #222;
+        :root {
+            --paper: #f5f0e6;
+            --ink: #242d45;
+            --white: #fffefa;
+            --peach: #ffb49a;
+            --yellow: #f5d878;
+            --green: #b8d9b5;
+            --purple: #c7b9e8;
+            --blue: #a9cce9;
         }
 
-        h1 {
-            text-align: center;
-        }
-
-        button,
-        input,
-        select,
-        textarea {
-            font: inherit;
-            padding: 8px;
-        }
-
-        button {
-            cursor: pointer;
-        }
-
-        button:disabled {
-            cursor: not-allowed;
-            opacity: 0.5;
-        }
-
-        .page-controls {
-            margin-bottom: 20px;
-        }
-
-        .sort-panel {
-            margin-bottom: 20px;
-        }
-
-        .sort-panel select {
-            margin: 5px;
-        }
-
-        .search-panel {
-            margin-bottom: 15px;
-        }
-
-        .activity-board {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-
-        .course-tile {
-            background: white;
-            border: 1px solid #ccc;
-            padding: 15px;
-            width: 220px;
+        * {
             box-sizing: border-box;
         }
 
-        .course-tile i {
-            font-size: 30px;
-            color: #285a8e;
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            padding: 40px 30px 80px;
+            color: var(--ink);
+            background-color: var(--paper);
+            background-image:
+                radial-gradient(#d9cfbe 1px, transparent 1px);
+            background-size: 24px 24px;
+            font-family: "Trebuchet MS", Arial, sans-serif;
+        }
+
+        #app {
+            max-width: 1240px;
+            margin: auto;
+        }
+
+        h1 {
+            margin: 10px 0 25px;
+            text-align: center;
+            color: #304c82;
+            font-size: clamp(42px, 7vw, 86px);
+            font-weight: 900;
+            line-height: 1.05;
+            letter-spacing: -3px;
+        }
+
+        .intro-text {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #495773;
+        }
+
+        h2,
+        h3 {
+            font-weight: 800;
+        }
+
+        p {
+            line-height: 1.6;
+        }
+
+        /* Buttons */
+        button {
+            padding: 12px 20px;
+            border: 2px solid var(--ink);
+            border-radius: 12px;
+            background: var(--ink);
+            color: white;
+            font: inherit;
+            font-size: 14px;
+            font-weight: bold;
+            box-shadow: 0 4px 0 #121a2b;
+            cursor: pointer;
+            transition:
+                transform 0.15s ease,
+                box-shadow 0.15s ease;
+        }
+
+        button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 0 #121a2b;
+        }
+
+        button:active:not(:disabled) {
+            transform: translateY(3px);
+            box-shadow: none;
+        }
+
+        button:disabled {
+            background: #e7e8eb;
+            color: #656b78;
+            border-color: #a7aab2;
+            border-style: dashed;
+            box-shadow: none;
+            cursor: not-allowed;
+        }
+
+        .page-controls {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .page-controls button {
+            min-width: 220px;
+            background: var(--yellow);
+            color: var(--ink);
+            border-radius: 30px;
+        }
+
+        /* Search and sorting */
+        .search-panel,
+        .sort-panel {
+            background: var(--white);
+            border: 2px solid var(--ink);
+            border-radius: 16px;
+            padding: 18px;
+            margin-bottom: 18px;
+        }
+
+        .search-panel {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .search-panel label {
+            flex-shrink: 0;
+            font-weight: bold;
+        }
+
+        .search-panel input {
+            width: 100%;
+            min-width: 0;
+        }
+
+        .sort-panel {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .sort-panel select {
+            min-width: 145px;
+            margin-right: 15px;
+        }
+
+        input,
+        select,
+        textarea {
+            padding: 12px;
+            border: 2px solid #7a8291;
+            border-radius: 10px;
+            background: white;
+            color: var(--ink);
+            font: inherit;
+            font-size: 15px;
+        }
+
+        input::placeholder,
+        textarea::placeholder {
+            color: #626b7b;
+        }
+
+        /* Lesson and cart cards */
+        .activity-board {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 28px;
+            margin: 25px 0 35px;
+        }
+
+        .course-tile {
+            --card-colour: var(--peach);
+
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            min-width: 0;
+            padding: 25px;
+            border: 2px solid var(--ink);
+            border-radius: 24px;
+            background: var(--card-colour);
+            box-shadow: 5px 5px 0 var(--ink);
+            transition:
+                transform 0.2s ease,
+                box-shadow 0.2s ease;
+        }
+
+        /* Colours stay attached to each lesson when sorting. */
+        .tone-0 {
+            --card-colour: var(--peach);
+        }
+
+        .tone-1 {
+            --card-colour: var(--blue);
+        }
+
+        .tone-2 {
+            --card-colour: var(--green);
+        }
+
+        .tone-3 {
+            --card-colour: var(--purple);
+        }
+
+        .tone-4 {
+            --card-colour: var(--yellow);
+        }
+
+        .course-tile:hover {
+            transform: translateY(-5px);
+            box-shadow: 5px 10px 0 var(--ink);
+        }
+
+        .course-tile > i {
+            display: grid;
+            place-items: center;
+            width: 65px;
+            height: 65px;
+            margin-bottom: 20px;
+            border: 2px solid var(--ink);
+            border-radius: 18px;
+            background: var(--white);
+            font-size: 27px;
         }
 
         .course-tile h2 {
-            font-size: 20px;
+            width: 100%;
+            margin: 0 0 15px;
+            font-size: 29px;
+            line-height: 1.15;
+            overflow-wrap: anywhere;
         }
 
+        .course-tile > p {
+            width: 100%;
+            margin: 0 0 10px;
+            font-size: 15px;
+        }
+
+        .course-tile > button {
+            width: 100%;
+            margin-top: auto;
+        }
+
+        /* Availability */
+        .space-panel {
+            --status: #235d45;
+
+            width: 100%;
+            margin: 15px 0 23px;
+            padding: 15px;
+            border: 2px solid var(--ink);
+            border-radius: 16px;
+            background: var(--white);
+        }
+
+        .space-panel.low-spaces {
+            --status: #8a4c00;
+            background: #fff5dd;
+        }
+
+        .space-panel.no-spaces {
+            --status: #a12e3b;
+            background: #fff0f1;
+        }
+
+        .space-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .space-heading {
+            font-size: 10px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .space-status {
+            color: var(--status);
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .space-amount {
+            display: flex;
+            align-items: baseline;
+            gap: 9px;
+            margin: 12px 0;
+        }
+
+        .space-number {
+            display: inline-block;
+            min-width: 32px;
+            color: var(--status);
+            font-size: 43px;
+            font-weight: 900;
+            line-height: 1;
+        }
+
+        .space-caption {
+            color: #596273;
+            font-size: 13px;
+        }
+
+        .space-markers {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 6px;
+        }
+
+        .space-marker {
+            height: 10px;
+            border: 1px solid #cbd0d5;
+            border-radius: 3px;
+            background: #e7eaed;
+            transition: background 0.25s ease;
+        }
+
+        .space-marker.is-open {
+            border-color: var(--status);
+            background: var(--status);
+        }
+
+        .space-change {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 7px;
+            margin-top: 12px;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .space-change strong {
+            padding: 2px 7px;
+            border-radius: 5px;
+            font-size: 13px;
+        }
+
+        .space-change.decreased {
+            color: #963449;
+        }
+
+        .space-change.decreased strong {
+            background: #ffe5eb;
+        }
+
+        .space-change.increased {
+            color: #235d45;
+        }
+
+        .space-change.increased strong {
+            background: #dfefe5;
+        }
+
+        .space-count-enter-active {
+            animation: count-bounce 0.4s ease;
+        }
+
+        .space-event-enter-active {
+            animation: change-arrives 0.35s ease;
+        }
+
+        @keyframes count-bounce {
+            0% {
+                opacity: 0.3;
+                transform: translateY(9px) scale(0.75);
+            }
+
+            60% {
+                transform: translateY(-3px) scale(1.15);
+            }
+
+            100% {
+                opacity: 1;
+                transform: none;
+            }
+        }
+
+        @keyframes change-arrives {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+
+        /* Checkout */
         .checkout-box {
-            background: white;
-            border: 1px solid #ccc;
-            max-width: 450px;
-            padding: 20px;
-            margin-top: 25px;
+            width: 100%;
+            max-width: 620px;
+            margin: 40px auto 0;
+            padding: 32px;
+            border: 2px solid var(--ink);
+            border-radius: 24px;
+            background: var(--white);
+            box-shadow: 6px 6px 0 var(--ink);
+        }
+
+        .checkout-box > h2 {
+            margin-top: 0;
+            font-size: 36px;
+        }
+
+        .checkout-box h3 {
+            margin: 25px 0 20px;
+            padding: 9px 13px;
+            border: 2px solid var(--ink);
+            border-radius: 10px;
+            background: var(--green);
+            font-size: 18px;
         }
 
         .checkout-box label {
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: bold;
         }
 
         .checkout-box input,
         .checkout-box select,
         .checkout-box textarea {
             width: 100%;
-            box-sizing: border-box;
         }
 
         .checkout-box textarea {
+            min-height: 110px;
             resize: vertical;
         }
 
+        .checkout-box button[type="submit"] {
+            width: 100%;
+            padding: 16px;
+            margin-top: 18px;
+            background: var(--peach);
+            color: var(--ink);
+            font-size: 17px;
+        }
+
+        .checkout-box button[type="submit"]:disabled {
+            background: #e7e8eb;
+            color: #656b78;
+        }
+
         .form-field {
-            margin-bottom: 15px;
-        }
-
-        .error-text {
-            color: #b00020;
-            font-size: 13px;
-        }
-
-        .notice-box {
-            padding: 15px;
-            border: 1px solid #285a8e;
-            background: #eaf2fa;
-            margin-bottom: 20px;
+            margin-bottom: 22px;
         }
 
         .small-note {
+            color: #535c70;
             font-size: 13px;
-            color: #555;
+            line-height: 1.6;
+        }
+
+        .error-text {
+            padding: 12px 15px;
+            border: 2px solid #9c4753;
+            border-radius: 12px;
+            background: #ffe8e8;
+            color: #7b2533;
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        .error-text ul {
+            padding-left: 20px;
+        }
+
+        .ready-text {
+            padding: 12px 15px;
+            border: 2px solid #47745b;
+            border-radius: 12px;
+            background: #e8f4e8;
+            color: #28553c;
+        }
+
+        .notice-box {
+            margin-bottom: 30px;
+            padding: 22px;
+            border: 2px solid var(--ink);
+            border-radius: 18px;
+            background: var(--green);
+            box-shadow: 4px 4px 0 var(--ink);
+        }
+
+        .notice-box p {
+            margin-top: 0;
+        }
+
+        .cart-total {
+            font-size: 24px;
+        }
+
+        button:focus-visible,
+        input:focus-visible,
+        select:focus-visible,
+        textarea:focus-visible {
+            outline: 3px solid #2448c7;
+            outline-offset: 4px;
         }
 
         [v-cloak] {
             display: none;
         }
 
-        @media (max-width: 550px) {
-            .course-tile {
-                width: 100%;
+        @media (max-width: 1000px) {
+            .activity-board {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 24px 16px 55px;
             }
 
-            .sort-panel label {
+            h1 {
+                letter-spacing: -2px;
+            }
+
+            .activity-board {
+                grid-template-columns: 1fr;
+            }
+
+            .search-panel {
                 display: block;
-                margin-top: 10px;
             }
 
-            .search-panel input {
+            .search-panel label {
+                display: block;
+                margin-bottom: 10px;
+            }
+
+            .sort-panel {
+                display: grid;
+                grid-template-columns: auto 1fr;
+            }
+
+            .sort-panel select {
                 width: 100%;
-                box-sizing: border-box;
+                min-width: 0;
+                margin: 0;
+            }
+
+            .page-controls button {
+                width: 100%;
+            }
+
+            .checkout-box {
+                padding: 24px 18px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            html {
+                scroll-behavior: auto;
+            }
+
+            *,
+            *::before,
+            *::after {
+                animation: none !important;
+                transition: none !important;
+            }
+
+            .course-tile:hover,
+            button:hover:not(:disabled),
+            button:active:not(:disabled) {
+                transform: none;
             }
         }
     </style>
@@ -156,7 +607,12 @@
 
         <h1>{{ sitename }}</h1>
 
-        <!-- Switch between lessons and cart. -->
+        <p class="intro-text">
+            Find a new interest. Learn a new skill.
+            Make your afternoon count.
+        </p>
+
+        <!-- Cart navigation -->
         <div class="page-controls">
             <button
                 type="button"
@@ -168,7 +624,7 @@
             </button>
         </div>
 
-        <!-- Temporary checkout message. -->
+        <!-- Demo checkout confirmation -->
         <div
             class="notice-box"
             v-if="checkoutMessage"
@@ -187,16 +643,14 @@
         <!-- LESSON PAGE -->
         <div v-if="showLessons">
 
-            <p>Choose an after-school lesson.</p>
-
             <div class="search-panel">
-                <label for="searchText">Search lessons:</label>
+                <label for="searchText">Search lessons</label>
 
                 <input
                     id="searchText"
                     type="search"
                     v-model="searchText"
-                    placeholder="Search subject, location, price or spaces">
+                    placeholder="Subject, location, price or spaces">
             </div>
 
             <div class="sort-panel">
@@ -225,16 +679,13 @@
 
             <div class="activity-board">
 
-                <!-- Display each lesson using v-for. -->
                 <div
                     class="course-tile"
                     v-for="lesson in sortedLessons"
-                    :key="lesson.id">
+                    :key="lesson.id"
+                    :class="'tone-' + ((lesson.id - 1) % 5)">
 
-                    <i
-                        :class="lesson.icon"
-                        aria-hidden="true">
-                    </i>
+                    <i :class="lesson.icon" aria-hidden="true"></i>
 
                     <h2>{{ lesson.subject }}</h2>
 
@@ -242,7 +693,98 @@
 
                     <p>Price: {{ lesson.price }} AED</p>
 
-                    <p>Spaces: {{ lesson.spaces }}</p>
+                    <!-- Availability display -->
+                    <div
+                        class="space-panel"
+                        :class="{
+                            'low-spaces':
+                                lesson.spaces > 0 && lesson.spaces <= 2,
+                            'no-spaces':
+                                lesson.spaces === 0
+                        }">
+
+                        <div class="space-top">
+                            <span class="space-heading">
+                                Availability
+                            </span>
+
+                            <span class="space-status">
+                                {{ lesson.spaces === 0
+                                    ? 'Fully booked'
+                                    : lesson.spaces <= 2
+                                        ? 'Almost full'
+                                        : 'Open for booking' }}
+                            </span>
+                        </div>
+
+                        <div class="space-amount">
+                            <transition name="space-count">
+                                <strong
+                                    class="space-number"
+                                    :key="lesson.spaces">
+
+                                    {{ lesson.spaces }}
+                                </strong>
+                            </transition>
+
+                            <span class="space-caption">
+                                {{ lesson.spaces === 1
+                                    ? 'space left'
+                                    : 'spaces left' }}
+                            </span>
+                        </div>
+
+                        <!-- Five markers represent the initial capacity. -->
+                        <div class="space-markers" aria-hidden="true">
+                            <span
+                                v-for="marker in 5"
+                                :key="marker"
+                                class="space-marker"
+                                :class="{
+                                    'is-open': marker <= lesson.spaces
+                                }">
+                            </span>
+                        </div>
+
+                        <!-- Explain the most recent change. -->
+                        <div aria-live="polite" aria-atomic="true">
+                            <transition name="space-event">
+                                <div
+                                    v-if="spaceChanges[lesson.id]"
+                                    :key="spaceChanges[lesson.id].version"
+                                    class="space-change"
+                                    :class="{
+                                        decreased:
+                                            spaceChanges[lesson.id].delta < 0,
+                                        increased:
+                                            spaceChanges[lesson.id].delta > 0
+                                    }">
+
+                                    <strong>
+                                        {{
+                                            spaceChanges[lesson.id].delta > 0
+                                            ? '+1'
+                                            : '−1'
+                                        }}
+                                    </strong>
+
+                                    <span>
+                                        Last change:
+                                        {{ spaceChanges[lesson.id].before }}
+                                        →
+                                        {{ lesson.spaces }}
+
+                                        {{
+                                            spaceChanges[lesson.id].delta > 0
+                                            ? '— space restored'
+                                            : '— added to cart'
+                                        }}
+                                    </span>
+                                </div>
+                            </transition>
+                        </div>
+
+                    </div>
 
                     <button
                         type="button"
@@ -271,11 +813,11 @@
 
             <div class="activity-board">
 
-                <!-- One entry represents one selected space. -->
                 <div
                     class="course-tile"
                     v-for="(lessonId, index) in cart"
-                    :key="index">
+                    :key="index"
+                    :class="'tone-' + ((lessonId - 1) % 5)">
 
                     <i
                         :class="findLesson(lessonId).icon"
@@ -307,9 +849,10 @@
 
             </div>
 
-            <h3>Total: {{ cartTotal }} AED</h3>
+            <h3 class="cart-total">
+                Total: {{ cartTotal }} AED
+            </h3>
 
-            <!-- Allows returning even after removing all items. -->
             <button
                 type="button"
                 v-on:click="showLessons = true">
@@ -317,7 +860,7 @@
                 Continue browsing
             </button>
 
-            <!-- CHECKOUT -->
+            <!-- CHECKOUT FORM -->
             <div class="checkout-box">
 
                 <h2>Checkout</h2>
@@ -330,16 +873,12 @@
                     Fields marked * are required.
                 </p>
 
-                <form
-                    v-on:submit.prevent="checkout"
-                    novalidate>
+                <form v-on:submit.prevent="checkout" novalidate>
 
                     <h3>Customer details</h3>
 
                     <div class="form-field">
-                        <label for="customerName">
-                            Name *
-                        </label>
+                        <label for="customerName">Name *</label>
 
                         <input
                             id="customerName"
@@ -352,13 +891,6 @@
                         <p id="nameHelp" class="small-note">
                             Letters A–Z only, without spaces,
                             numbers or punctuation.
-                        </p>
-
-                        <p
-                            class="error-text"
-                            v-if="customerName !== '' && !validName">
-
-                            Please enter letters only.
                         </p>
                     </div>
 
@@ -379,21 +911,12 @@
                         <p id="phoneHelp" class="small-note">
                             Digits 0–9 only, without spaces or +.
                         </p>
-
-                        <p
-                            class="error-text"
-                            v-if="customerPhone !== '' && !validPhone">
-
-                            Please enter digits only.
-                        </p>
                     </div>
 
                     <h3>Address details</h3>
 
                     <div class="form-field">
-                        <label for="city">
-                            City / Emirate *
-                        </label>
+                        <label for="city">City / Emirate *</label>
 
                         <select
                             id="city"
@@ -429,9 +952,7 @@
                     </div>
 
                     <div class="form-field">
-                        <label for="street">
-                            Street *
-                        </label>
+                        <label for="street">Street *</label>
 
                         <input
                             id="street"
@@ -480,23 +1001,31 @@
                         </textarea>
                     </div>
 
-                    <p
-                        class="small-note"
-                        v-if="cart.length === 0">
-
-                        Add a lesson before checking out.
-                    </p>
-
-                    <p
-                        class="small-note"
-                        v-if="!validAddress">
-
-                        Complete the required address fields.
-                    </p>
-
                     <h3>Order total: {{ cartTotal }} AED</h3>
 
-                    <!-- Always visible on the cart page. -->
+                    <!-- Errors update as the customer types. -->
+                    <div
+                        v-if="checkoutErrors.length > 0"
+                        class="error-text"
+                        aria-live="polite">
+
+                        <p>Please complete the following:</p>
+
+                        <ul>
+                            <li
+                                v-for="error in checkoutErrors"
+                                :key="error">
+
+                                {{ error }}
+                            </li>
+                        </ul>
+                    </div>
+
+                    <p v-else class="ready-text">
+                        Your details are complete.
+                        You can checkout now.
+                    </p>
+
                     <button
                         type="submit"
                         :disabled="!canCheckout">
@@ -525,11 +1054,17 @@
                 sortOrder: "asc",
 
                 cart: [],
+                spaceChanges: {},
 
                 customerName: "",
                 customerPhone: "",
+                city: "",
+                area: "",
+                street: "",
+                building: "",
+                apartment: "",
+                orderNotes: "",
 
-                
                 checkoutMessage: "",
 
                 lessons: [
@@ -658,7 +1193,6 @@
                         return searchableText.includes(query);
                     });
 
-                    // Sort the matching lessons.
                     result.sort(function (a, b) {
                         let comparison;
 
@@ -697,18 +1231,54 @@
                     return /^[0-9]+$/.test(this.customerPhone);
                 },
 
-                validAddress: function () {
-                    return this.city !== "" &&
-                        this.area.trim() !== "" &&
-                        this.street.trim() !== "" &&
-                        this.building.trim() !== "";
+                checkoutErrors: function () {
+                    const errors = [];
+
+                    if (this.cart.length === 0) {
+                        errors.push(
+                            "Add at least one lesson to your cart."
+                        );
+                    }
+
+                    if (this.customerName === "") {
+                        errors.push("Enter your name.");
+                    } else if (!this.validName) {
+                        errors.push(
+                            "Your name must contain letters only, without spaces."
+                        );
+                    }
+
+                    if (this.customerPhone === "") {
+                        errors.push("Enter your phone number.");
+                    } else if (!this.validPhone) {
+                        errors.push(
+                            "Your phone number must contain digits only."
+                        );
+                    }
+
+                    if (this.city === "") {
+                        errors.push("Choose your city / emirate.");
+                    }
+
+                    if (this.area.trim() === "") {
+                        errors.push("Enter your area / neighbourhood.");
+                    }
+
+                    if (this.street.trim() === "") {
+                        errors.push("Enter your street name or number.");
+                    }
+
+                    if (this.building.trim() === "") {
+                        errors.push(
+                            "Enter your building name or villa number."
+                        );
+                    }
+
+                    return errors;
                 },
 
                 canCheckout: function () {
-                    return this.cart.length > 0 &&
-                        this.validName &&
-                        this.validPhone &&
-                        this.validAddress;
+                    return this.checkoutErrors.length === 0;
                 }
             },
 
@@ -720,22 +1290,44 @@
                 },
 
                 addToCart: function (lesson) {
-                    if (lesson.spaces > 0) {
-                        this.cart.push(lesson.id);
-                        lesson.spaces--;
-                        this.checkoutMessage = "";
+                    if (lesson.spaces <= 0) {
+                        return;
                     }
+
+                    const previousSpaces = lesson.spaces;
+                    const lastChange = this.spaceChanges[lesson.id];
+
+                    this.cart.push(lesson.id);
+                    lesson.spaces--;
+
+                    // Track the change so Vue can display and animate it.
+                    this.$set(this.spaceChanges, lesson.id, {
+                        before: previousSpaces,
+                        delta: -1,
+                        version: lastChange
+                            ? lastChange.version + 1
+                            : 1
+                    });
+
+                    this.checkoutMessage = "";
                 },
 
                 removeFromCart: function (index) {
                     const lessonId = this.cart[index];
                     const lesson = this.findLesson(lessonId);
+                    const previousSpaces = lesson.spaces;
+                    const lastChange = this.spaceChanges[lessonId];
 
-                    // Restore one available space.
                     lesson.spaces++;
-
-                    // Remove one selected space.
                     this.cart.splice(index, 1);
+
+                    this.$set(this.spaceChanges, lessonId, {
+                        before: previousSpaces,
+                        delta: 1,
+                        version: lastChange
+                            ? lastChange.version + 1
+                            : 1
+                    });
 
                     this.checkoutMessage = "";
                 },
@@ -745,22 +1337,22 @@
                         return;
                     }
 
-                    // Demonstrate validation.
-                    // The backend will save the order later.
                     this.checkoutMessage =
-                        "Checkout details are valid for " +
+                        "Checkout confirmed for " +
                         this.customerName +
-                        ". Address: " +
-                        this.building.trim() +
-                        ", " +
-                        this.street.trim() +
-                        ", " +
-                        this.area.trim() +
-                        ", " +
-                        this.city +
+                        ". Selected spaces: " +
+                        this.cart.length +
                         ". Total: " +
                         this.cartTotal +
-                        " AED. Demo only: no order has been saved.";
+                        " AED. Frontend demo only — no order has been saved.";
+
+                    // Keep the cart until backend submission is implemented.
+                    window.scrollTo({
+                        top: 0,
+                        behavior: window.matchMedia(
+                            "(prefers-reduced-motion: reduce)"
+                        ).matches ? "auto" : "smooth"
+                    });
                 }
             }
         });
