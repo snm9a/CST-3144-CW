@@ -2,901 +2,634 @@
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1">
 
     <title>After-School Lessons</title>
 
+    <!-- CSS -->
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Vue.js -->
     <script src="https://unpkg.com/vue@2.7.16/dist/vue.js"></script>
 
-    <style>
-        :root {
-            --paper: #f5f0e6;
-            --ink: #242d45;
-            --white: #fffefa;
-            --peach: #ffb49a;
-            --yellow: #f5d878;
-            --green: #b8d9b5;
-            --purple: #c7b9e8;
-            --blue: #a9cce9;
-        }
-
-        * {
-            box-sizing: border-box;
-        }
-
-        html {
-            scroll-behavior: smooth;
-        }
-
-        body {
-            margin: 0;
-            padding: 40px 30px 80px;
-            color: var(--ink);
-            background-color: var(--paper);
-            background-image:
-                radial-gradient(#d9cfbe 1px, transparent 1px);
-            background-size: 24px 24px;
-            font-family: "Trebuchet MS", Arial, sans-serif;
-        }
-
-        #app {
-            max-width: 1240px;
-            margin: auto;
-        }
-
-        h1 {
-            margin: 10px 0 25px;
-            text-align: center;
-            color: #304c82;
-            font-size: clamp(42px, 7vw, 86px);
-            font-weight: 900;
-            line-height: 1.05;
-            letter-spacing: -3px;
-        }
-
-        .intro-text {
-            text-align: center;
-            margin-bottom: 30px;
-            color: #495773;
-        }
-
-        h2,
-        h3 {
-            font-weight: 800;
-        }
-
-        p {
-            line-height: 1.6;
-        }
-
-        /* Buttons */
-        button {
-            padding: 12px 20px;
-            border: 2px solid var(--ink);
-            border-radius: 12px;
-            background: var(--ink);
-            color: white;
-            font: inherit;
-            font-size: 14px;
-            font-weight: bold;
-            box-shadow: 0 4px 0 #121a2b;
-            cursor: pointer;
-            transition:
-                transform 0.15s ease,
-                box-shadow 0.15s ease;
-        }
-
-        button:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 0 #121a2b;
-        }
-
-        button:active:not(:disabled) {
-            transform: translateY(3px);
-            box-shadow: none;
-        }
-
-        button:disabled {
-            background: #e7e8eb;
-            color: #656b78;
-            border-color: #a7aab2;
-            border-style: dashed;
-            box-shadow: none;
-            cursor: not-allowed;
-        }
-
-        .page-controls {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 30px;
-        }
-
-        .page-controls button {
-            min-width: 220px;
-            background: var(--yellow);
-            color: var(--ink);
-            border-radius: 30px;
-        }
-
-        /* Search and sorting */
-        .search-panel,
-        .sort-panel {
-            background: var(--white);
-            border: 2px solid var(--ink);
-            border-radius: 16px;
-            padding: 18px;
-            margin-bottom: 18px;
-        }
-
-        .search-panel {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .search-panel label {
-            flex-shrink: 0;
-            font-weight: bold;
-        }
-
-        .search-panel input {
-            width: 100%;
-            min-width: 0;
-        }
-
-        .sort-panel {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .sort-panel select {
-            min-width: 145px;
-            margin-right: 15px;
-        }
-
-        input,
-        select,
-        textarea {
-            padding: 12px;
-            border: 2px solid #7a8291;
-            border-radius: 10px;
-            background: white;
-            color: var(--ink);
-            font: inherit;
-            font-size: 15px;
-        }
-
-        input::placeholder,
-        textarea::placeholder {
-            color: #626b7b;
-        }
-
-        /* Lesson and cart cards */
-        .activity-board {
-            display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 28px;
-            margin: 25px 0 35px;
-        }
-
-        .course-tile {
-            --card-colour: var(--peach);
-
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            min-width: 0;
-            padding: 22px;
-            border: 2px solid var(--ink);
-            border-radius: 24px;
-            background: var(--card-colour);
-            box-shadow: 5px 5px 0 var(--ink);
-            transition:
-                transform 0.2s ease,
-                box-shadow 0.2s ease;
-        }
-
-        .tone-0 {
-            --card-colour: var(--peach);
-        }
-
-        .tone-1 {
-            --card-colour: var(--blue);
-        }
-
-        .tone-2 {
-            --card-colour: var(--green);
-        }
-
-        .tone-3 {
-            --card-colour: var(--purple);
-        }
-
-        .tone-4 {
-            --card-colour: var(--yellow);
-        }
-
-        .course-tile:hover {
-            transform: translateY(-5px);
-            box-shadow: 5px 10px 0 var(--ink);
-        }
-
-        .lesson-picture {
-            display: block;
-            width: 100%;
-            height: auto;
-            aspect-ratio: 5 / 4;
-            object-fit: contain;
-            margin-bottom: 20px;
-            border: 2px solid var(--ink);
-            border-radius: 16px;
-            background: #fffaf0;
-        }
-
-        .course-tile h2 {
-            width: 100%;
-            margin: 0 0 15px;
-            font-size: 29px;
-            line-height: 1.15;
-            overflow-wrap: anywhere;
-        }
-
-        .course-tile > p {
-            width: 100%;
-            margin: 0 0 10px;
-            font-size: 15px;
-        }
-
-        .course-tile > button {
-            width: 100%;
-            margin-top: auto;
-        }
-
-        /* Availability */
-        .space-panel {
-            --status: #235d45;
-
-            width: 100%;
-            margin: 15px 0 23px;
-            padding: 15px;
-            border: 2px solid var(--ink);
-            border-radius: 16px;
-            background: var(--white);
-        }
-
-        .space-panel.low-spaces {
-            --status: #8a4c00;
-            background: #fff5dd;
-        }
-
-        .space-panel.no-spaces {
-            --status: #a12e3b;
-            background: #fff0f1;
-        }
-
-        .space-top {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-
-        .space-heading {
-            font-size: 10px;
-            font-weight: bold;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
-
-        .space-status {
-            color: var(--status);
-            font-size: 11px;
-            font-weight: bold;
-        }
-
-        .space-amount {
-            display: flex;
-            align-items: baseline;
-            gap: 9px;
-            margin: 12px 0;
-        }
-
-        .space-number {
-            display: inline-block;
-            min-width: 32px;
-            color: var(--status);
-            font-size: 43px;
-            font-weight: 900;
-            line-height: 1;
-        }
-
-        .space-caption {
-            color: #596273;
-            font-size: 13px;
-        }
-
-        .space-markers {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 6px;
-        }
-
-        .space-marker {
-            height: 10px;
-            border: 1px solid #cbd0d5;
-            border-radius: 3px;
-            background: #e7eaed;
-            transition: background 0.25s ease;
-        }
-
-        .space-marker.is-open {
-            border-color: var(--status);
-            background: var(--status);
-        }
-
-        .space-change {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            gap: 7px;
-            margin-top: 12px;
-            font-size: 12px;
-            line-height: 1.5;
-        }
-
-        .space-change strong {
-            padding: 2px 7px;
-            border-radius: 5px;
-            font-size: 13px;
-        }
-
-        .space-change.decreased {
-            color: #963449;
-        }
-
-        .space-change.decreased strong {
-            background: #ffe5eb;
-        }
-
-        .space-change.increased {
-            color: #235d45;
-        }
-
-        .space-change.increased strong {
-            background: #dfefe5;
-        }
-
-        .space-count-enter-active {
-            animation: count-bounce 0.4s ease;
-        }
-
-        .space-event-enter-active {
-            animation: change-arrives 0.35s ease;
-        }
-
-        @keyframes count-bounce {
-            0% {
-                opacity: 0.3;
-                transform: translateY(9px) scale(0.75);
-            }
-
-            60% {
-                transform: translateY(-3px) scale(1.15);
-            }
-
-            100% {
-                opacity: 1;
-                transform: none;
-            }
-        }
-
-        @keyframes change-arrives {
-            from {
-                opacity: 0;
-                transform: translateY(5px);
-            }
-
-            to {
-                opacity: 1;
-                transform: none;
-            }
-        }
-
-        /* Checkout */
-        .checkout-box {
-            width: 100%;
-            max-width: 620px;
-            margin: 40px auto 0;
-            padding: 32px;
-            border: 2px solid var(--ink);
-            border-radius: 24px;
-            background: var(--white);
-            box-shadow: 6px 6px 0 var(--ink);
-        }
-
-        .checkout-box > h2 {
-            margin-top: 0;
-            font-size: 36px;
-        }
-
-        .checkout-box h3 {
-            margin: 25px 0 20px;
-            padding: 9px 13px;
-            border: 2px solid var(--ink);
-            border-radius: 10px;
-            background: var(--green);
-            font-size: 18px;
-        }
-
-        .checkout-box label {
-            display: block;
-            margin-bottom: 8px;
-            font-size: 14px;
-            font-weight: bold;
-        }
-
-        .checkout-box input,
-        .checkout-box select,
-        .checkout-box textarea {
-            width: 100%;
-        }
-
-        .checkout-box textarea {
-            min-height: 110px;
-            resize: vertical;
-        }
-
-        .checkout-box button[type="submit"] {
-            width: 100%;
-            padding: 16px;
-            margin-top: 18px;
-            background: var(--peach);
-            color: var(--ink);
-            font-size: 17px;
-        }
-
-        .checkout-box button[type="submit"]:disabled {
-            background: #e7e8eb;
-            color: #656b78;
-        }
-
-        .form-field {
-            margin-bottom: 22px;
-        }
-
-        .small-note {
-            color: #535c70;
-            font-size: 13px;
-            line-height: 1.6;
-        }
-
-        .error-text {
-            padding: 12px 15px;
-            border: 2px solid #9c4753;
-            border-radius: 12px;
-            background: #ffe8e8;
-            color: #7b2533;
-            font-size: 13px;
-            line-height: 1.7;
-        }
-
-        .error-text ul {
-            padding-left: 20px;
-        }
-
-        .ready-text {
-            padding: 12px 15px;
-            border: 2px solid #47745b;
-            border-radius: 12px;
-            background: #e8f4e8;
-            color: #28553c;
-        }
-
-        .notice-box {
-            margin-bottom: 30px;
-            padding: 22px;
-            border: 2px solid var(--ink);
-            border-radius: 18px;
-            background: var(--green);
-            box-shadow: 4px 4px 0 var(--ink);
-        }
-
-        .notice-box p {
-            margin-top: 0;
-        }
-
-        .cart-total {
-            font-size: 24px;
-        }
-
-        button:focus-visible,
-        input:focus-visible,
-        select:focus-visible,
-        textarea:focus-visible {
-            outline: 3px solid #2448c7;
-            outline-offset: 4px;
-        }
-
-        [v-cloak] {
-            display: none;
-        }
-
-        @media (max-width: 1000px) {
-            .activity-board {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-            }
-        }
-
-        @media (max-width: 600px) {
-            body {
-                padding: 24px 16px 55px;
-            }
-
-            h1 {
-                letter-spacing: -2px;
-            }
-
-            .activity-board {
-                grid-template-columns: 1fr;
-            }
-
-            .search-panel {
-                display: block;
-            }
-
-            .search-panel label {
-                display: block;
-                margin-bottom: 10px;
-            }
-
-            .sort-panel {
-                display: grid;
-                grid-template-columns: auto 1fr;
-            }
-
-            .sort-panel select {
-                width: 100%;
-                min-width: 0;
-                margin: 0;
-            }
-
-            .page-controls button {
-                width: 100%;
-            }
-
-            .checkout-box {
-                padding: 24px 18px;
-            }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-            html {
-                scroll-behavior: auto;
-            }
-
-            *,
-            *::before,
-            *::after {
-                animation: none !important;
-                transition: none !important;
-            }
-
-            .course-tile:hover,
-            button:hover:not(:disabled),
-            button:active:not(:disabled) {
-                transform: none;
-            }
-        }
-    </style>
 </head>
+
 
 <body>
 
-    <div id="app" v-cloak>
+<div id="app" v-cloak>
 
-        <h1>{{ sitename }}</h1>
+    <h1>{{ sitename }}</h1>
 
-        <p class="intro-text">
-            Find a new interest. Learn a new skill.
-            Make your afternoon count.
+    <p class="intro-text">
+        Find a new interest. Learn a new skill.
+        Make your afternoon count.
+    </p>
+
+
+    <!-- MAIN NAVIGATION -->
+
+    <div class="page-controls">
+
+        <button
+            type="button"
+            v-on:click="showLessons = !showLessons"
+            :disabled="cart.length === 0">
+
+            {{ showLessons ? 'View Cart' : 'Back to Lessons' }}
+
+            ({{ cartItemCount }})
+
+        </button>
+
+    </div>
+
+
+    <!-- SUCCESS MESSAGE -->
+
+    <div
+        class="notice-box"
+        v-if="checkoutMessage"
+        role="status">
+
+        <h2>
+            Booking confirmed ✓
+        </h2>
+
+        <p>
+            {{ checkoutMessage }}
         </p>
 
-        <!-- Switch between the lesson list and cart. -->
-        <div class="page-controls">
-            <button
-                type="button"
-                v-on:click="showLessons = !showLessons"
-                :disabled="cart.length === 0">
+        <button
+            type="button"
+            v-on:click="checkoutMessage = ''">
 
-                {{ showLessons ? 'View Cart' : 'Back to Lessons' }}
-                ({{ cart.length }})
-            </button>
+            Close message
+
+        </button>
+
+    </div>
+
+
+    <!-- LESSON PAGE -->
+
+    <div v-if="showLessons">
+
+        <!-- SEARCH -->
+
+        <div class="search-panel">
+
+            <label for="searchText">
+                Search lessons
+            </label>
+
+            <input
+                id="searchText"
+                type="search"
+                v-model="searchText"
+                placeholder="Subject, location, price or spaces">
+
         </div>
 
-        <div
-            class="notice-box"
-            v-if="checkoutMessage"
-            role="status">
 
-            <p>{{ checkoutMessage }}</p>
+        <!-- SORT -->
 
-            <button
-                type="button"
-                v-on:click="checkoutMessage = ''">
+        <div class="sort-panel">
 
-                Close message
-            </button>
+            <label for="sortBy">
+                Sort by:
+            </label>
+
+            <select
+                id="sortBy"
+                v-model="sortBy">
+
+                <option value="subject">
+                    Subject
+                </option>
+
+                <option value="location">
+                    Location
+                </option>
+
+                <option value="price">
+                    Price
+                </option>
+
+                <option value="spaces">
+                    Spaces
+                </option>
+
+            </select>
+
+
+            <label for="sortOrder">
+                Order:
+            </label>
+
+            <select
+                id="sortOrder"
+                v-model="sortOrder">
+
+                <option value="asc">
+                    Ascending
+                </option>
+
+                <option value="desc">
+                    Descending
+                </option>
+
+            </select>
+
         </div>
 
-        <!-- LESSON PAGE -->
-        <div v-if="showLessons">
 
-            <div class="search-panel">
-                <label for="searchText">Search lessons</label>
+        <p>
+            Showing
+            <strong>{{ sortedLessons.length }}</strong>
+            lessons.
+        </p>
 
-                <input
-                    id="searchText"
-                    type="search"
-                    v-model="searchText"
-                    placeholder="Subject, location, price or spaces">
-            </div>
 
-            <div class="sort-panel">
-                <label for="sortBy">Sort by:</label>
+        <p v-if="sortedLessons.length === 0">
 
-                <select id="sortBy" v-model="sortBy">
-                    <option value="subject">Subject</option>
-                    <option value="location">Location</option>
-                    <option value="price">Price</option>
-                    <option value="spaces">Spaces</option>
-                </select>
+            No lessons match your search.
 
-                <label for="sortOrder">Order:</label>
+        </p>
 
-                <select id="sortOrder" v-model="sortOrder">
-                    <option value="asc">Ascending</option>
-                    <option value="desc">Descending</option>
-                </select>
-            </div>
 
-            <p>Showing {{ sortedLessons.length }} lessons.</p>
+        <!-- LESSON CARDS -->
 
-            <p v-if="sortedLessons.length === 0">
-                No lessons match your search.
-            </p>
+        <div class="activity-board">
 
-            <div class="activity-board">
+            <div
+                class="course-tile"
+                v-for="lesson in sortedLessons"
+                :key="lesson.id"
+                :class="'tone-' + ((lesson.id - 1) % 5)">
+
+                <img
+                    class="lesson-picture"
+                    :src="lesson.image"
+                    :alt="lesson.subject + ' illustration'"
+                    width="500"
+                    height="400">
+
+                <h2>
+                    {{ lesson.subject }}
+                </h2>
+
+                <p>
+                    Location:
+                    <strong>
+                        {{ lesson.location }}
+                    </strong>
+                </p>
+
+                <p>
+                    Price:
+                    <strong>
+                        {{ lesson.price }} AED
+                    </strong>
+                </p>
+
+
+                <!-- AVAILABILITY -->
 
                 <div
-                    class="course-tile"
-                    v-for="lesson in sortedLessons"
-                    :key="lesson.id"
-                    :class="'tone-' + ((lesson.id - 1) % 5)">
+                    class="space-panel"
+                    :class="{
+                        'low-spaces':
+                            lesson.spaces > 0 &&
+                            lesson.spaces <= 2,
 
-                    <!-- Individual clay illustration -->
-                    <img
-                        class="lesson-picture"
-                        :src="lesson.image"
-                        :alt="lesson.subject + ' illustration'"
-                        width="500"
-                        height="400"
-                        loading="lazy">
+                        'no-spaces':
+                            lesson.spaces === 0
+                    }">
 
-                    <h2>{{ lesson.subject }}</h2>
+                    <div class="space-top">
 
-                    <p>Location: {{ lesson.location }}</p>
+                        <span class="space-heading">
+                            Availability
+                        </span>
 
-                    <p>Price: {{ lesson.price }} AED</p>
+                        <span class="space-status">
 
-                    <!-- Availability display -->
-                    <div
-                        class="space-panel"
-                        :class="{
-                            'low-spaces':
-                                lesson.spaces > 0 && lesson.spaces <= 2,
-                            'no-spaces':
+                            {{
                                 lesson.spaces === 0
-                        }">
-
-                        <div class="space-top">
-                            <span class="space-heading">
-                                Availability
-                            </span>
-
-                            <span class="space-status">
-                                {{ lesson.spaces === 0
                                     ? 'Fully booked'
                                     : lesson.spaces <= 2
                                         ? 'Almost full'
-                                        : 'Open for booking' }}
-                            </span>
-                        </div>
+                                        : 'Open for booking'
+                            }}
 
-                        <div class="space-amount">
-                            <transition name="space-count">
-                                <strong
-                                    class="space-number"
-                                    :key="lesson.spaces">
-
-                                    {{ lesson.spaces }}
-                                </strong>
-                            </transition>
-
-                            <span class="space-caption">
-                                {{ lesson.spaces === 1
-                                    ? 'space left'
-                                    : 'spaces left' }}
-                            </span>
-                        </div>
-
-                        <div class="space-markers" aria-hidden="true">
-                            <span
-                                v-for="marker in 5"
-                                :key="marker"
-                                class="space-marker"
-                                :class="{
-                                    'is-open': marker <= lesson.spaces
-                                }">
-                            </span>
-                        </div>
-
-                        <div aria-live="polite" aria-atomic="true">
-                            <transition name="space-event">
-                                <div
-                                    v-if="spaceChanges[lesson.id]"
-                                    :key="spaceChanges[lesson.id].version"
-                                    class="space-change"
-                                    :class="{
-                                        decreased:
-                                            spaceChanges[lesson.id].delta < 0,
-                                        increased:
-                                            spaceChanges[lesson.id].delta > 0
-                                    }">
-
-                                    <strong>
-                                        {{
-                                            spaceChanges[lesson.id].delta > 0
-                                            ? '+1'
-                                            : '−1'
-                                        }}
-                                    </strong>
-
-                                    <span>
-                                        Last change:
-                                        {{ spaceChanges[lesson.id].before }}
-                                        →
-                                        {{ lesson.spaces }}
-
-                                        {{
-                                            spaceChanges[lesson.id].delta > 0
-                                            ? '— space restored'
-                                            : '— added to cart'
-                                        }}
-                                    </span>
-                                </div>
-                            </transition>
-                        </div>
+                        </span>
 
                     </div>
 
-                    <button
-                        type="button"
-                        v-on:click="addToCart(lesson)"
-                        :disabled="lesson.spaces === 0">
 
-                        Add to Cart
-                    </button>
+                    <div class="space-amount">
+
+                        <strong class="space-number">
+                            {{ lesson.spaces }}
+                        </strong>
+
+                        <span class="space-caption">
+
+                            {{
+                                lesson.spaces === 1
+                                    ? 'space left'
+                                    : 'spaces left'
+                            }}
+
+                        </span>
+
+                    </div>
+
+
+                    <div
+                        class="space-markers"
+                        aria-hidden="true">
+
+                        <span
+                            v-for="marker in 5"
+                            :key="marker"
+                            class="space-marker"
+                            :class="{
+                                'is-open':
+                                    marker <= lesson.spaces
+                            }">
+
+                        </span>
+
+                    </div>
+
+
+                    <div
+                        v-if="spaceChanges[lesson.id]"
+                        class="space-change"
+                        :class="{
+                            decreased:
+                                spaceChanges[lesson.id].delta < 0,
+
+                            increased:
+                                spaceChanges[lesson.id].delta > 0
+                        }">
+
+                        <strong>
+
+                            {{
+                                spaceChanges[lesson.id].delta > 0
+                                    ? '+1'
+                                    : '−1'
+                            }}
+
+                        </strong>
+
+                        <span>
+
+                            Last change:
+
+                            {{ spaceChanges[lesson.id].before }}
+
+                            →
+
+                            {{ lesson.spaces }}
+
+                            {{
+                                spaceChanges[lesson.id].delta > 0
+                                    ? '— space restored'
+                                    : '— added to cart'
+                            }}
+
+                        </span>
+
+                    </div>
 
                 </div>
+
+
+                <button
+                    type="button"
+                    v-on:click="addToCart(lesson)"
+                    :disabled="lesson.spaces === 0">
+
+                    {{
+                        lesson.spaces === 0
+                            ? 'Fully Booked'
+                            : 'Add to Cart'
+                    }}
+
+                </button>
 
             </div>
 
         </div>
 
-        <!-- CART PAGE -->
-        <div v-else>
+    </div>
 
-            <h2>Your Cart</h2>
 
-            <p>Selected spaces: {{ cart.length }}</p>
+    <!-- CART PAGE -->
 
-            <p v-if="cart.length === 0">
-                Your cart is empty.
+    <div v-else>
+
+        <div class="cart-header">
+
+            <h2>
+                Your Cart
+            </h2>
+
+            <p>
+
+                You selected
+
+                <strong>
+                    {{ cartItemCount }}
+                </strong>
+
+                {{
+                    cartItemCount === 1
+                        ? 'space'
+                        : 'spaces'
+                }}
+
+                across
+
+                <strong>
+                    {{ groupedCart.length }}
+                </strong>
+
+                {{
+                    groupedCart.length === 1
+                        ? 'activity'
+                        : 'activities'
+                }}.
+
             </p>
 
-            <div class="activity-board">
+        </div>
 
-                <div
-                    class="course-tile"
-                    v-for="(lessonId, index) in cart"
-                    :key="index"
-                    :class="'tone-' + ((lessonId - 1) % 5)">
 
-                    <img
-                        class="lesson-picture"
-                        :src="findLesson(lessonId).image"
-                        :alt="findLesson(lessonId).subject + ' illustration'"
-                        width="500"
-                        height="400"
-                        loading="lazy">
+        <!-- EMPTY CART -->
 
-                    <h2>{{ findLesson(lessonId).subject }}</h2>
+        <div
+            class="empty-cart"
+            v-if="cart.length === 0">
 
-                    <p>
-                        Location:
-                        {{ findLesson(lessonId).location }}
-                    </p>
+            <h2>
+                Your cart is empty
+            </h2>
 
-                    <p>
-                        Price:
-                        {{ findLesson(lessonId).price }} AED
-                    </p>
-
-                    <p>Quantity: 1 space</p>
-
-                    <button
-                        type="button"
-                        v-on:click="removeFromCart(index)">
-
-                        Remove
-                    </button>
-
-                </div>
-
-            </div>
-
-            <h3 class="cart-total">
-                Total: {{ cartTotal }} AED
-            </h3>
+            <p>
+                Explore the lessons and choose
+                an activity you would like to book.
+            </p>
 
             <button
                 type="button"
                 v-on:click="showLessons = true">
 
-                Continue browsing
+                Browse Lessons
+
             </button>
 
+        </div>
+
+
+        <!-- CART CONTENT -->
+
+        <div v-else>
+
+            <div class="activity-board">
+
+                <div
+                    class="course-tile"
+                    v-for="item in groupedCart"
+                    :key="item.lesson.id"
+                    :class="'tone-' + ((item.lesson.id - 1) % 5)">
+
+                    <img
+                        class="lesson-picture"
+                        :src="item.lesson.image"
+                        :alt="item.lesson.subject + ' illustration'"
+                        width="500"
+                        height="400">
+
+                    <h2>
+                        {{ item.lesson.subject }}
+                    </h2>
+
+                    <p>
+                        Location:
+                        <strong>
+                            {{ item.lesson.location }}
+                        </strong>
+                    </p>
+
+                    <p>
+                        Price per space:
+                        <strong>
+                            {{ item.lesson.price }} AED
+                        </strong>
+                    </p>
+
+
+                    <div class="quantity-panel">
+
+                        <div class="quantity-line">
+
+                            <span>
+                                Quantity
+                            </span>
+
+                            <strong>
+
+                                {{ item.quantity }}
+
+                                {{
+                                    item.quantity === 1
+                                        ? 'space'
+                                        : 'spaces'
+                                }}
+
+                            </strong>
+
+                        </div>
+
+
+                        <div class="quantity-line">
+
+                            <span>
+                                Lesson total
+                            </span>
+
+                            <strong>
+
+                                {{
+                                    item.lesson.price *
+                                    item.quantity
+                                }}
+
+                                AED
+
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+
+                    <button
+                        class="remove-one-button"
+                        type="button"
+                        v-on:click="
+                            removeOneFromCart(
+                                item.lesson.id
+                            )
+                        ">
+
+                        Remove one space
+
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- CART SUMMARY -->
+
+            <div class="cart-total-box">
+
+                <p>
+                    Selected spaces:
+                    <strong>
+                        {{ cartItemCount }}
+                    </strong>
+                </p>
+
+                <p>
+                    Different activities:
+                    <strong>
+                        {{ groupedCart.length }}
+                    </strong>
+                </p>
+
+                <h3 class="cart-total-price">
+
+                    Total:
+                    {{ cartTotal }} AED
+
+                </h3>
+
+            </div>
+
+
             <!-- CHECKOUT -->
+
             <div class="checkout-box">
 
-                <h2>Checkout</h2>
-
-                <p class="small-note">
-                    Frontend demo only. Orders are not yet saved.
+                <p class="checkout-label">
+                    READY TO BOOK?
                 </p>
 
-                <p class="small-note">
-                    Fields marked * are required.
+                <h2>
+                    Complete your booking
+                </h2>
+
+                <p class="checkout-description">
+                    Enter your details below to confirm
+                    the activities you selected.
                 </p>
 
-                <form v-on:submit.prevent="checkout" novalidate>
 
-                    <h3>Customer details</h3>
+                <div class="checkout-summary">
+
+                    <div class="checkout-summary-row">
+
+                        <span>
+                            Activities
+                        </span>
+
+                        <strong>
+                            {{ groupedCart.length }}
+                        </strong>
+
+                    </div>
+
+                    <div class="checkout-summary-row">
+
+                        <span>
+                            Selected spaces
+                        </span>
+
+                        <strong>
+                            {{ cartItemCount }}
+                        </strong>
+
+                    </div>
+
+                    <div
+                        class="
+                            checkout-summary-row
+                            checkout-summary-total
+                        ">
+
+                        <span>
+                            Total
+                        </span>
+
+                        <strong>
+                            {{ cartTotal }} AED
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <form
+                    v-on:submit.prevent="checkout"
+                    novalidate>
 
                     <div class="form-field">
-                        <label for="customerName">Name *</label>
+
+                        <label for="customerName">
+                            Full Name *
+                        </label>
 
                         <input
                             id="customerName"
                             type="text"
                             v-model="customerName"
-                            autocomplete="given-name"
-                            aria-describedby="nameHelp"
-                            required>
+                            placeholder="Enter your full name">
 
-                        <p id="nameHelp" class="small-note">
-                            Letters A–Z only, without spaces,
-                            numbers or punctuation.
+                        <p class="field-note">
+                            Letters and spaces only.
                         </p>
+
+                        <p
+                            class="field-error"
+                            v-if="
+                                customerName.length > 0 &&
+                                !validName
+                            ">
+
+                            Please enter a valid name.
+
+                        </p>
+
                     </div>
 
+
                     <div class="form-field">
+
                         <label for="customerPhone">
-                            Phone number *
+                            Phone Number *
                         </label>
 
                         <input
@@ -904,132 +637,43 @@
                             type="tel"
                             inputmode="numeric"
                             v-model="customerPhone"
-                            autocomplete="tel"
-                            aria-describedby="phoneHelp"
-                            required>
+                            placeholder="Example: 0501234567">
 
-                        <p id="phoneHelp" class="small-note">
-                            Digits 0–9 only, without spaces or +.
+                        <p class="field-note">
+                            Numbers only.
                         </p>
+
+                        <p
+                            class="field-error"
+                            v-if="
+                                customerPhone.length > 0 &&
+                                !validPhone
+                            ">
+
+                            Please enter numbers only.
+
+                        </p>
+
                     </div>
 
-                    <h3>Address details</h3>
-
-                    <div class="form-field">
-                        <label for="city">City / Emirate *</label>
-
-                        <select
-                            id="city"
-                            v-model="city"
-                            autocomplete="address-level1"
-                            required>
-
-                            <option disabled value="">
-                                Choose your emirate
-                            </option>
-
-                            <option>Abu Dhabi</option>
-                            <option>Dubai</option>
-                            <option>Sharjah</option>
-                            <option>Ajman</option>
-                            <option>Umm Al Quwain</option>
-                            <option>Ras Al Khaimah</option>
-                            <option>Fujairah</option>
-                        </select>
-                    </div>
-
-                    <div class="form-field">
-                        <label for="area">
-                            Area / Neighbourhood *
-                        </label>
-
-                        <input
-                            id="area"
-                            type="text"
-                            v-model="area"
-                            placeholder="For example: Al Barsha"
-                            required>
-                    </div>
-
-                    <div class="form-field">
-                        <label for="street">Street *</label>
-
-                        <input
-                            id="street"
-                            type="text"
-                            v-model="street"
-                            placeholder="Street name or number"
-                            required>
-                    </div>
-
-                    <div class="form-field">
-                        <label for="building">
-                            Building / Villa number *
-                        </label>
-
-                        <input
-                            id="building"
-                            type="text"
-                            v-model="building"
-                            placeholder="Building name or villa number"
-                            required>
-                    </div>
-
-                    <div class="form-field">
-                        <label for="apartment">
-                            Apartment / Unit — optional
-                        </label>
-
-                        <input
-                            id="apartment"
-                            type="text"
-                            v-model="apartment"
-                            placeholder="For example: Apartment 204">
-                    </div>
-
-                    <div class="form-field">
-                        <label for="orderNotes">
-                            Additional notes — optional
-                        </label>
-
-                        <textarea
-                            id="orderNotes"
-                            v-model="orderNotes"
-                            rows="3"
-                            maxlength="500"
-                            placeholder="Anything you would like us to know">
-                        </textarea>
-                    </div>
-
-                    <h3>Order total: {{ cartTotal }} AED</h3>
-
-                    <div
-                        v-if="checkoutErrors.length > 0"
-                        class="error-text"
-                        aria-live="polite">
-
-                        <p>Please complete the following:</p>
-
-                        <ul>
-                            <li
-                                v-for="error in checkoutErrors"
-                                :key="error">
-
-                                {{ error }}
-                            </li>
-                        </ul>
-                    </div>
-
-                    <p v-else class="ready-text">
-                        Your details are complete.
-                        You can checkout now.
-                    </p>
 
                     <button
+                        class="confirm-booking"
                         type="submit"
                         :disabled="!canCheckout">
 
-                        Checkout
+                        Confirm Booking
+
+                    </button>
+
+
+                    <button
+                        class="continue-browsing"
+                        type="button"
+                        v-on:click="showLessons = true">
+
+                        Continue Browsing
+
                     </button>
 
                 </form>
@@ -1040,320 +684,92 @@
 
     </div>
 
-    <script>
-        let app = new Vue({
-            el: "#app",
 
-            data: {
-                sitename: "After-School Lessons",
+    <!-- FOOTER -->
 
-                showLessons: true,
-                searchText: "",
-                sortBy: "subject",
-                sortOrder: "asc",
+    <footer class="website-footer">
 
-                cart: [],
-                spaceChanges: {},
+        <div class="footer-content">
 
-                customerName: "",
-                customerPhone: "",
-                city: "",
-                area: "",
-                street: "",
-                building: "",
-                apartment: "",
-                orderNotes: "",
+            <div class="footer-about">
 
-                checkoutMessage: "",
+                <h2>
+                    After-School Lessons
+                </h2>
 
-                lessons: [
-                    {
-                        id: 1,
-                        subject: "Mathematics",
-                        location: "Al Barsha",
-                        price: 80,
-                        spaces: 5,
-                        image: "images/maths.png"
-                    },
-                    {
-                        id: 2,
-                        subject: "English",
-                        location: "Jumeirah",
-                        price: 75,
-                        spaces: 5,
-                        image: "images/english.png"
-                    },
-                    {
-                        id: 3,
-                        subject: "Science",
-                        location: "Mirdif",
-                        price: 90,
-                        spaces: 5,
-                        image: "images/science.png"
-                    },
-                    {
-                        id: 4,
-                        subject: "Art",
-                        location: "Al Quoz",
-                        price: 65,
-                        spaces: 5,
-                        image: "images/art.png"
-                    },
-                    {
-                        id: 5,
-                        subject: "Music",
-                        location: "Dubai Marina",
-                        price: 100,
-                        spaces: 5,
-                        image: "images/music.png"
-                    },
-                    {
-                        id: 6,
-                        subject: "Football",
-                        location: "Mirdif",
-                        price: 70,
-                        spaces: 5,
-                        image: "images/football.png"
-                    },
-                    {
-                        id: 7,
-                        subject: "Basketball",
-                        location: "Jumeirah",
-                        price: 85,
-                        spaces: 5,
-                        image: "images/basketball.png"
-                    },
-                    {
-                        id: 8,
-                        subject: "Swimming",
-                        location: "Al Nahda",
-                        price: 95,
-                        spaces: 5,
-                        image: "images/swimming.png"
-                    },
-                    {
-                        id: 9,
-                        subject: "Coding",
-                        location: "Silicon Oasis",
-                        price: 110,
-                        spaces: 5,
-                        image: "images/coding.png"
-                    },
-                    {
-                        id: 10,
-                        subject: "Robotics",
-                        location: "Academic City",
-                        price: 120,
-                        spaces: 5,
-                        image: "images/robotics.png"
-                    },
-                    {
-                        id: 11,
-                        subject: "Diving",
-                        location: "Jumeirah Beach",
-                        price: 450,
-                        spaces: 5,
-                        image: "images/diving.png"
-                    },
-                    {
-                        id: 12,
-                        subject: "Rugby",
-                        location: "Academic City",
-                        price: 195,
-                        spaces: 5,
-                        image: "images/rugby.png"
-                    },
-                    {
-                        id: 13,
-                        subject: "Photography",
-                        location: "Dubai Marina",
-                        price: 620,
-                        spaces: 5,
-                        image: "images/photography.png"
-                    }
-                ]
-            },
+                <p>
+                    More ways to learn.
+                    More interests to discover.
+                    Explore academic, creative and
+                    sporting activities across Dubai.
+                </p>
 
-            computed: {
-                sortedLessons: function () {
-                    const query = this.searchText.trim().toLowerCase();
-                    const field = this.sortBy;
-                    const order = this.sortOrder;
+                <span class="footer-badge">
+                    Make time for something new.
+                </span>
 
-                    // Temporary frontend search.
-                    const result = this.lessons.filter(function (lesson) {
-                        const searchableText = [
-                            lesson.subject,
-                            lesson.location,
-                            lesson.price,
-                            lesson.spaces
-                        ].join(" ").toLowerCase();
+            </div>
 
-                        return searchableText.includes(query);
-                    });
 
-                    result.sort(function (a, b) {
-                        let comparison;
+            <div>
 
-                        if (field === "price" || field === "spaces") {
-                            comparison = a[field] - b[field];
-                        } else {
-                            comparison = a[field].localeCompare(b[field]);
-                        }
+                <h3>
+                    Explore
+                </h3>
 
-                        if (order === "desc") {
-                            comparison = -comparison;
-                        }
+                <ul>
 
-                        return comparison;
-                    });
+                    <li>
+                        <a href="#app">
+                            Browse lessons
+                        </a>
+                    </li>
 
-                    return result;
-                },
+                    <li>
+                        <a href="#app">
+                            Booking
+                        </a>
+                    </li>
 
-                cartTotal: function () {
-                    let total = 0;
+                </ul>
 
-                    for (let i = 0; i < this.cart.length; i++) {
-                        const lesson = this.findLesson(this.cart[i]);
-                        total += lesson.price;
-                    }
+            </div>
 
-                    return total;
-                },
 
-                validName: function () {
-                    return /^[A-Za-z]+$/.test(this.customerName);
-                },
+            <div>
 
-                validPhone: function () {
-                    return /^[0-9]+$/.test(this.customerPhone);
-                },
+                <h3>
+                    Get in touch
+                </h3>
 
-                checkoutErrors: function () {
-                    const errors = [];
+                <p class="footer-contact-text">
+                    Questions about a lesson
+                    or your booking?
+                </p>
 
-                    if (this.cart.length === 0) {
-                        errors.push(
-                            "Add at least one lesson to your cart."
-                        );
-                    }
+                <a href="mailto:YOUR_EMAIL@example.com">
+                    Email our team ↗
+                </a>
 
-                    if (this.customerName === "") {
-                        errors.push("Enter your name.");
-                    } else if (!this.validName) {
-                        errors.push(
-                            "Your name must contain letters only, without spaces."
-                        );
-                    }
+            </div>
 
-                    if (this.customerPhone === "") {
-                        errors.push("Enter your phone number.");
-                    } else if (!this.validPhone) {
-                        errors.push(
-                            "Your phone number must contain digits only."
-                        );
-                    }
+        </div>
 
-                    if (this.city === "") {
-                        errors.push("Choose your city / emirate.");
-                    }
 
-                    if (this.area.trim() === "") {
-                        errors.push("Enter your area / neighbourhood.");
-                    }
+        <div class="footer-bottom">
 
-                    if (this.street.trim() === "") {
-                        errors.push("Enter your street name or number.");
-                    }
+            After-School Lessons · Dubai
 
-                    if (this.building.trim() === "") {
-                        errors.push(
-                            "Enter your building name or villa number."
-                        );
-                    }
+        </div>
 
-                    return errors;
-                },
+    </footer>
 
-                canCheckout: function () {
-                    return this.checkoutErrors.length === 0;
-                }
-            },
+</div>
 
-            methods: {
-                findLesson: function (lessonId) {
-                    return this.lessons.find(function (lesson) {
-                        return lesson.id === lessonId;
-                    });
-                },
 
-                addToCart: function (lesson) {
-                    if (lesson.spaces <= 0) {
-                        return;
-                    }
-
-                    const previousSpaces = lesson.spaces;
-                    const lastChange = this.spaceChanges[lesson.id];
-
-                    this.cart.push(lesson.id);
-                    lesson.spaces--;
-
-                    this.$set(this.spaceChanges, lesson.id, {
-                        before: previousSpaces,
-                        delta: -1,
-                        version: lastChange
-                            ? lastChange.version + 1
-                            : 1
-                    });
-
-                    this.checkoutMessage = "";
-                },
-
-                removeFromCart: function (index) {
-                    const lessonId = this.cart[index];
-                    const lesson = this.findLesson(lessonId);
-                    const previousSpaces = lesson.spaces;
-                    const lastChange = this.spaceChanges[lessonId];
-
-                    lesson.spaces++;
-                    this.cart.splice(index, 1);
-
-                    this.$set(this.spaceChanges, lessonId, {
-                        before: previousSpaces,
-                        delta: 1,
-                        version: lastChange
-                            ? lastChange.version + 1
-                            : 1
-                    });
-
-                    this.checkoutMessage = "";
-                },
-
-                checkout: function () {
-                    if (!this.canCheckout) {
-                        return;
-                    }
-
-                    this.checkoutMessage =
-                        "Checkout confirmed for " +
-                        this.customerName +
-                        ". Selected spaces: " +
-                        this.cart.length +
-                        ". Total: " +
-                        this.cartTotal +
-                        " AED. Frontend demo only — no order has been saved.";
-
-                    window.scrollTo({
-                        top: 0,
-                        behavior: window.matchMedia(
-                            "(prefers-reduced-motion: reduce)"
-                        ).matches ? "auto" : "smooth"
-                    });
-                }
-            }
-        });
-    </script>
+<!-- YOUR JAVASCRIPT FILE -->
+<script src="app.js"></script>
 
 </body>
+
 </html>
